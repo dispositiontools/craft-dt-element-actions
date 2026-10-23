@@ -14,7 +14,6 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\events\DefineHtmlEvent;
 use craft\helpers\Html;
-use craft\commerce\elements\Product;
 use dispositiontools\dtelementactions\models\Settings;
 use ReflectionMethod;
 use yii\base\Event;
@@ -85,9 +84,11 @@ class DtElementActions extends Plugin
             );
         }
 
-        if (class_exists(Product::class)) {
+        $productClass = self::productClass();
+
+        if ($productClass !== null) {
             Event::on(
-                Product::class,
+                $productClass,
                 Element::EVENT_DEFINE_ADDITIONAL_BUTTONS,
                 function(DefineHtmlEvent $event): void {
                     if ($event->static || !$event->sender instanceof ElementInterface) {
@@ -98,8 +99,8 @@ class DtElementActions extends Plugin
                 }
             );
 
-            Craft::$app->getView()->hook('cp.commerce.product.edit.details', function(array $context): string {
-                return isset($context['product']) && $context['product'] instanceof Product
+            Craft::$app->getView()->hook('cp.commerce.product.edit.details', function(array $context) use ($productClass): string {
+                return isset($context['product']) && $context['product'] instanceof $productClass
                     ? $this->actionButtonsHtml($context['product'])
                     : '';
             });
@@ -129,8 +130,6 @@ class DtElementActions extends Plugin
         ];
 
         // todo: we need to grab from a config file any other actions that should be excluded
-
-
         $actions = array_filter(
             $actions,
             static fn(ElementActionInterface $action): bool => !isset($excludedActions[$action::class])
@@ -207,8 +206,6 @@ class DtElementActions extends Plugin
 
     private function sourceKey(ElementInterface $element): ?string
     {
-
-      
         if ($element instanceof Entry) {
             return $element->getSection() ? 'section:' . $element->getSection()->uid : null;
         }
@@ -221,11 +218,20 @@ class DtElementActions extends Plugin
             return $element->getVolume() ? 'volume:' . $element->getVolume()->uid : null;
         }
 
-        if (class_exists(Product::class) && $element instanceof Product) {
+        $productClass = self::productClass();
+
+        if ($productClass !== null && $element instanceof $productClass) {
             return $element->getType() ? 'productType:' . $element->getType()->uid : null;
         }
 
         return null;
+    }
+
+    private static function productClass(): ?string
+    {
+        $productClass = 'craft\\commerce\\elements\\Product';
+
+        return class_exists($productClass) ? $productClass : null;
     }
 
     private function registerActionButtonsJs(ElementInterface $element, string $elementType, string $source): void
