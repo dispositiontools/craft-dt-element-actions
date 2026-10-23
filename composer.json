@@ -3,7 +3,7 @@
     "description": "Trigger element actions from the element page",
     "type": "craft-plugin",
     "license": "proprietary",
-    "version": "0.0.1",
+    "version": "5.0.1",
     "support": {
         "email": "support@disposition.tools",
         "issues": "https://github.com/dispositiontools/craft-dt-element-actions/issues?state=open",

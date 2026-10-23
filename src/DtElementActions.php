@@ -130,8 +130,6 @@ class DtElementActions extends Plugin
         ];
 
         // todo: we need to grab from a config file any other actions that should be excluded
-
-
         $actions = array_filter(
             $actions,
             static fn(ElementActionInterface $action): bool => !isset($excludedActions[$action::class])
@@ -208,8 +206,6 @@ class DtElementActions extends Plugin
 
     private function sourceKey(ElementInterface $element): ?string
     {
-
-      
         if ($element instanceof Entry) {
             return $element->getSection() ? 'section:' . $element->getSection()->uid : null;
         }
@@ -233,9 +229,9 @@ class DtElementActions extends Plugin
 
     private static function productClass(): ?string
     {
-        return class_exists('craft\\commerce\\elements\\Product')
-            ? 'craft\\commerce\\elements\\Product'
-            : null;
+        $productClass = 'craft\\commerce\\elements\\Product';
+
+        return class_exists($productClass) ? $productClass : null;
     }
 
     private function registerActionButtonsJs(ElementInterface $element, string $elementType, string $source): void
