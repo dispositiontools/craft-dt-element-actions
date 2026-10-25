@@ -75,7 +75,7 @@ class DtElementActions extends Plugin
                 $elementType,
                 Element::EVENT_DEFINE_ADDITIONAL_BUTTONS,
                 function(DefineHtmlEvent $event): void {
-                    if ($event->static || !$event->sender instanceof ElementInterface) {
+                    if ((isset($event->static) && $event->static) || !$event->sender instanceof ElementInterface) {
                         return;
                     }
 
@@ -91,7 +91,7 @@ class DtElementActions extends Plugin
                 $productClass,
                 Element::EVENT_DEFINE_ADDITIONAL_BUTTONS,
                 function(DefineHtmlEvent $event): void {
-                    if ($event->static || !$event->sender instanceof ElementInterface) {
+                    if ((isset($event->static) && $event->static) || !$event->sender instanceof ElementInterface) {
                         return;
                     }
 
@@ -132,7 +132,7 @@ class DtElementActions extends Plugin
         // todo: we need to grab from a config file any other actions that should be excluded
         $actions = array_filter(
             $actions,
-            static fn(ElementActionInterface $action): bool => !isset($excludedActions[$action::class])
+            static fn(ElementActionInterface $action): bool => !isset($excludedActions[get_class($action)])
         );
 
         if (empty($actions)) {
@@ -254,10 +254,12 @@ class DtElementActions extends Plugin
                 data: {
                     elementType: $elementType,
                     source: $source,
+                    viewState: {static: false},
                     elementAction: \$trigger.data('action-class'),
                     elementIds: [$elementId],
                     criteria: {
                         siteId: $siteId,
+                        id: $elementId
                     },
                 },
             }).then((response) => {

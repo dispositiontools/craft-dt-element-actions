@@ -1,5 +1,10 @@
 # Release Notes for ElementActions
 
+## 5.0.2
+
+### Fixed
+- Error with viewState and the critera when clicking the Element action button
+
 ## 5.0.1
 
 ### Updated
